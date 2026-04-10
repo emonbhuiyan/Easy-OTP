@@ -106,21 +106,29 @@ TOTP logic, local storage, rendering, copy, edit, and delete features
 
 Clone the repository:
 
-`git clone https://github.com/yourusername/easy-otp.git`
+``` bash
+git clone https://github.com/emonbhuiyan/easy-otp.git
+```
 
 Open the project folder:
 
-`cd easy-otp`
+``` bash
+cd easy-otp
+```
 
 Then simply open `index.html` in your browser.
 
 You can also use a simple local server if you want:
 
-`python -m http.server`
+``` bash
+python -m http.server
+```
 
 Then visit:
 
-`http://localhost:8000`
+``` bash
+http://localhost:8000
+```
 
 ---
 
