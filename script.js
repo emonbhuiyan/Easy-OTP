@@ -157,27 +157,23 @@ window.copyCode = async function(code, label) {
   }
 };
 
-window.toggleEdit = function(id) {
-  const panel = document.getElementById(`edit-${id}`);
-  if (panel) {
-    panel.classList.toggle("d-none");
-  }
-};
-
-window.saveEdit = function(id, saved) {
+window.editEntry = function(id, saved) {
   const list = saved ? savedEntries : tempEntries;
   const entry = list.find(item => item.id === id);
 
   if (!entry) return;
 
-  const label = document.getElementById(`label-${id}`).value.trim();
-  const issuer = document.getElementById(`issuer-${id}`).value.trim();
+  const newLabel = prompt("Label", entry.label || "");
+  if (newLabel === null) return;
 
-  if (label) {
-    entry.label = label;
+  const newIssuer = prompt("Issuer", entry.issuer || "");
+  if (newIssuer === null) return;
+
+  if (newLabel.trim()) {
+    entry.label = newLabel.trim();
   }
 
-  entry.issuer = issuer;
+  entry.issuer = newIssuer.trim();
 
   if (saved) {
     saveEntries();
@@ -268,7 +264,7 @@ async function render() {
                 Copy
               </button>
 
-              <button class="btn btn-outline-secondary btn-sm" onclick="toggleEdit('${entry.id}')">
+              <button class="btn btn-outline-secondary btn-sm" onclick="editEntry('${entry.id}', ${entry.saved})">
                 <i class="fa-solid fa-pen me-1"></i>
                 Edit
               </button>
@@ -278,43 +274,6 @@ async function render() {
                 Delete
               </button>
             </div>
-
-            <div id="edit-${entry.id}" class="edit-panel d-none">
-              <div class="row g-2">
-                <div class="col-12">
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    id="label-${entry.id}"
-                    value="${entry.label.replace(/"/g, "&quot;")}"
-                    placeholder="Label"
-                  >
-                </div>
-
-                <div class="col-12">
-                  <input
-                    type="text"
-                    class="form-control form-control-sm"
-                    id="issuer-${entry.id}"
-                    value="${(entry.issuer || "").replace(/"/g, "&quot;")}"
-                    placeholder="Issuer"
-                  >
-                </div>
-
-                <div class="col-12 d-flex gap-2 flex-wrap">
-                  <button class="btn btn-primary btn-sm" onclick="saveEdit('${entry.id}', ${entry.saved})">
-                    <i class="fa-solid fa-check me-1"></i>
-                    Save
-                  </button>
-
-                  <button class="btn btn-outline-secondary btn-sm" onclick="toggleEdit('${entry.id}')">
-                    <i class="fa-solid fa-xmark me-1"></i>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>

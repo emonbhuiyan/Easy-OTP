@@ -319,16 +319,6 @@ body {
   margin-top: 1rem;
 }
 
-.edit-panel {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-soft);
-}
-
-.edit-panel .form-control {
-  border-radius: 12px;
-}
-
 .disclaimer-card {
   background: var(--yellow-soft);
   border: 1px solid #f3d68a;
