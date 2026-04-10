@@ -1,3 +1,4 @@
+// script.js
 const STORAGE_KEY = "easyOtpSavedKeys";
 
 const form = document.getElementById("totpForm");
@@ -23,9 +24,14 @@ function saveEntries() {
 function showMessage(message, type = "success") {
   const wrap = document.getElementById("toastChipWrap");
 
+  const icon =
+    type === "error"
+      ? "fa-circle-minus"
+      : "fa-circle-check";
+
   wrap.innerHTML = `
     <div class="toast-chip ${type}">
-      <i class="fa-solid ${type === "error" ? "fa-circle-xmark" : "fa-circle-check"}"></i>
+      <i class="fa-solid ${icon}"></i>
       <span>${message}</span>
     </div>
   `;
@@ -127,9 +133,7 @@ async function generateCode(entry) {
     ["sign"]
   );
 
-  const signature = new Uint8Array(
-    await crypto.subtle.sign("HMAC", cryptoKey, buffer)
-  );
+  const signature = new Uint8Array(await crypto.subtle.sign("HMAC", cryptoKey, buffer));
 
   const offset = signature[signature.length - 1] & 15;
 
@@ -139,7 +143,7 @@ async function generateCode(entry) {
     ((signature[offset + 2] & 255) << 8) |
     (signature[offset + 3] & 255);
 
-  return (binary % 10 ** entry.digits)
+  return (binary % (10 ** entry.digits))
     .toString()
     .padStart(entry.digits, "0");
 }
@@ -153,44 +157,53 @@ window.copyCode = async function(code, label) {
   }
 };
 
-window.editEntry = function(id, saved) {
+window.toggleEdit = function(id) {
+  const panel = document.getElementById(`edit-${id}`);
+  if (panel) {
+    panel.classList.toggle("d-none");
+  }
+};
+
+window.saveEdit = function(id, saved) {
   const list = saved ? savedEntries : tempEntries;
   const entry = list.find(item => item.id === id);
 
   if (!entry) return;
 
-  const label = prompt("Edit label:", entry.label || "");
-  if (label === null) return;
+  const label = document.getElementById(`label-${id}`).value.trim();
+  const issuer = document.getElementById(`issuer-${id}`).value.trim();
 
-  const issuer = prompt("Edit issuer:", entry.issuer || "");
-  if (issuer === null) return;
+  if (label) {
+    entry.label = label;
+  }
 
-  entry.label = label.trim() || entry.label;
-  entry.issuer = issuer.trim();
+  entry.issuer = issuer;
 
-  if (saved) saveEntries();
+  if (saved) {
+    saveEntries();
+  }
 
   render();
   showMessage(`Updated ${entry.label}.`);
 };
 
 window.removeEntry = function(id, saved) {
-  let removed;
+  const list = saved ? savedEntries : tempEntries;
+  const entry = list.find(item => item.id === id);
+
+  if (!entry) return;
+
+  if (!confirm(`Delete "${entry.label}"?`)) return;
 
   if (saved) {
-    removed = savedEntries.find(x => x.id === id);
-    savedEntries = savedEntries.filter(x => x.id !== id);
+    savedEntries = savedEntries.filter(item => item.id !== id);
     saveEntries();
   } else {
-    removed = tempEntries.find(x => x.id === id);
-    tempEntries = tempEntries.filter(x => x.id !== id);
+    tempEntries = tempEntries.filter(item => item.id !== id);
   }
 
   render();
-
-  if (removed) {
-    showMessage(`Deleted ${removed.label}.`);
-  }
+  showMessage(`Deleted ${entry.label}.`, "error");
 };
 
 async function render() {
@@ -255,7 +268,7 @@ async function render() {
                 Copy
               </button>
 
-              <button class="btn btn-outline-secondary btn-sm" onclick="editEntry('${entry.id}', ${entry.saved})">
+              <button class="btn btn-outline-secondary btn-sm" onclick="toggleEdit('${entry.id}')">
                 <i class="fa-solid fa-pen me-1"></i>
                 Edit
               </button>
@@ -264,6 +277,42 @@ async function render() {
                 <i class="fa-solid fa-trash me-1"></i>
                 Delete
               </button>
+            </div>
+
+            <div id="edit-${entry.id}" class="edit-panel d-none">
+              <div class="row g-2">
+                <div class="col-12">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="label-${entry.id}"
+                    value="${entry.label.replace(/"/g, "&quot;")}"
+                    placeholder="Label"
+                  >
+                </div>
+
+                <div class="col-12">
+                  <input
+                    type="text"
+                    class="form-control form-control-sm"
+                    id="issuer-${entry.id}"
+                    value="${(entry.issuer || "").replace(/"/g, "&quot;")}"
+                    placeholder="Issuer"
+                  >
+                </div>
+
+                <div class="col-12 d-flex gap-2 flex-wrap">
+                  <button class="btn btn-primary btn-sm" onclick="saveEdit('${entry.id}', ${entry.saved})">
+                    <i class="fa-solid fa-check me-1"></i>
+                    Save
+                  </button>
+
+                  <button class="btn btn-outline-secondary btn-sm" onclick="toggleEdit('${entry.id}')">
+                    <i class="fa-solid fa-xmark me-1"></i>
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -301,8 +350,8 @@ form.addEventListener("submit", e => {
     form.reset();
     saveCheckbox.checked = true;
 
-    showMessage(`Added ${entry.label}.`);
     render();
+    showMessage(`Added ${entry.label}.`);
   } catch {
     showMessage("Invalid TOTP URI or secret key.", "error");
   }
@@ -314,10 +363,14 @@ document.getElementById("refreshBtn").addEventListener("click", () => {
 });
 
 document.getElementById("clearSavedBtn").addEventListener("click", () => {
+  if (!savedEntries.length) return;
+
+  if (!confirm("Delete all saved OTPs?")) return;
+
   savedEntries = [];
   saveEntries();
   render();
-  showMessage("Saved OTPs cleared.");
+  showMessage("Saved OTPs cleared.", "error");
 });
 
 document.getElementById("clearFormBtn").addEventListener("click", () => {

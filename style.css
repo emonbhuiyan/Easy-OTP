@@ -1,3 +1,4 @@
+/* style.css */
 :root {
   --blue: #1a73e8;
   --blue-soft: #e8f0fe;
@@ -29,11 +30,16 @@ body {
   max-width: 1080px;
 }
 
+.hero-section,
+.main-card,
+.disclaimer-card {
+  border-radius: 28px;
+}
+
 .hero-section {
   position: relative;
   background: var(--card);
   border: 1px solid var(--border-soft);
-  border-radius: 28px;
   padding: 1.6rem 1.5rem;
   box-shadow: 0 1px 3px rgba(60,64,67,.1);
 }
@@ -52,7 +58,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  color: white;
   font-size: 1.6rem;
 }
 
@@ -89,14 +95,13 @@ body {
   display: inline-flex;
   align-items: center;
   gap: .5rem;
+  padding: .55rem .95rem;
+  border-radius: 999px;
   background: var(--yellow-soft);
   color: #9a6700;
   border: 1px solid #f3d68a;
-  border-radius: 999px;
-  padding: .55rem .95rem;
   text-decoration: none;
   font-size: .88rem;
-  font-weight: 500;
 }
 
 .notice-link:hover {
@@ -107,7 +112,6 @@ body {
 .main-card {
   background: var(--card);
   border: 1px solid var(--border-soft);
-  border-radius: 28px;
   box-shadow: 0 1px 3px rgba(60,64,67,.1);
 }
 
@@ -179,18 +183,6 @@ body {
   color: var(--blue);
 }
 
-.btn-outline-danger {
-  color: var(--red);
-  border-color: var(--border);
-  background: #fff;
-}
-
-.btn-outline-danger:hover {
-  color: #b3261e;
-  background: #fdecea;
-  border-color: #f3c4c0;
-}
-
 .btn-outline-secondary {
   color: var(--subtext);
   border-color: var(--border);
@@ -203,8 +195,20 @@ body {
   border-color: #d2d5d9;
 }
 
-.otp-card {
+.btn-outline-danger {
+  color: var(--red);
+  border-color: var(--border);
   background: #fff;
+}
+
+.btn-outline-danger:hover {
+  color: #b3261e;
+  background: #fdecea;
+  border-color: #f3c4c0;
+}
+
+.otp-card {
+  background: white;
   border: 1px solid var(--border-soft);
   border-radius: 24px;
   height: 100%;
@@ -260,8 +264,8 @@ body {
 
 .otp-meta {
   display: flex;
-  gap: .5rem;
   flex-wrap: wrap;
+  gap: .5rem;
   margin-top: 1rem;
 }
 
@@ -315,10 +319,19 @@ body {
   margin-top: 1rem;
 }
 
+.edit-panel {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-soft);
+}
+
+.edit-panel .form-control {
+  border-radius: 12px;
+}
+
 .disclaimer-card {
   background: var(--yellow-soft);
   border: 1px solid #f3d68a;
-  border-radius: 28px;
   padding: 1.8rem;
   color: #5f370e;
 }
@@ -370,6 +383,11 @@ body {
   .otp-header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .otp-card-top {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .otp-code {
