@@ -1,4 +1,5 @@
 // script.js
+
 const STORAGE_KEY = "easyOtpSavedKeys";
 
 const form = document.getElementById("totpForm");
@@ -9,25 +10,23 @@ const otpList = document.getElementById("otpList");
 const emptyState = document.getElementById("emptyState");
 const messageBox = document.getElementById("messageBox");
 
-let savedEntries = loadSavedEntries();
-let temporaryEntries = [];
+let savedEntries = [];
+let tempEntries = [];
 
-function loadSavedEntries() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-  } catch {
-    return [];
-  }
+try {
+  savedEntries = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+} catch {
+  savedEntries = [];
 }
 
 function saveEntries() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(savedEntries));
 }
 
-function showMessage(text, type = "success") {
+function showMessage(message, type = "success") {
   messageBox.innerHTML = `
     <div class="message message-${type}">
-      ${text}
+      ${message}
     </div>
   `;
 }
@@ -36,91 +35,121 @@ function clearMessage() {
   messageBox.innerHTML = "";
 }
 
-function nextLabel() {
-  const all = [...savedEntries, ...temporaryEntries];
+function getNextLabel() {
+  const all = [...savedEntries, ...tempEntries];
+
   let highest = 0;
 
   all.forEach(item => {
     const match = /^totp(\d+)$/i.exec(item.label || "");
-    if (match) highest = Math.max(highest, Number(match[1]));
+    if (match) {
+      highest = Math.max(highest, Number(match[1]));
+    }
   });
 
   return `totp${highest + 1}`;
 }
 
-function parseInput(value) {
-  const text = value.trim();
+function parseInput(raw) {
+  const value = raw.trim();
 
-  // plain Base32 secret support
+  // Plain Base32 secret
   if (
-    !text.toLowerCase().startsWith("otpauth://") &&
-    /^[A-Z2-7]{16,}$/i.test(text.replace(/\s+/g, ""))
+    !value.toLowerCase().startsWith("otpauth://") &&
+    /^[A-Z2-7\s=]{16,}$/i.test(value)
   ) {
     return {
-      secret: text.replace(/\s+/g, "").toUpperCase(),
+      secret: value.replace(/\s+/g, "").toUpperCase(),
       issuer: "",
       label: "",
-      algorithm: "SHA1",
       digits: 6,
-      period: 30
+      period: 30,
+      algorithm: "SHA-1"
     };
   }
 
   let url;
 
   try {
-    url = new URL(text);
+    url = new URL(value);
   } catch {
     throw new Error("Enter a valid otpauth://totp/... string or Base32 secret.");
   }
 
   if (url.protocol !== "otpauth:") {
-    throw new Error("The string must begin with otpauth://");
+    throw new Error("The URI must start with otpauth://");
   }
 
   if (url.hostname.toLowerCase() !== "totp") {
-    throw new Error("Only TOTP format is supported.");
+    throw new Error("Only TOTP entries are supported.");
   }
 
   const secret = url.searchParams.get("secret");
 
   if (!secret) {
-    throw new Error("No secret was found.");
+    throw new Error("No secret key was found.");
   }
 
-  const path = decodeURIComponent(url.pathname.replace(/^\/+/, ""));
+  const rawPath = decodeURIComponent(url.pathname.replace(/^\/+/, ""));
   const issuerParam = url.searchParams.get("issuer") || "";
 
   let issuer = issuerParam;
-  let label = path;
+  let label = rawPath;
 
-  if (path.includes(":")) {
-    const parts = path.split(":");
+  if (rawPath.includes(":")) {
+    const parts = rawPath.split(":");
 
-    if (!issuer) issuer = parts[0].trim();
+    if (!issuer) {
+      issuer = parts[0].trim();
+    }
+
     label = parts.slice(1).join(":").trim();
+  }
+
+  const algorithmRaw = (url.searchParams.get("algorithm") || "SHA1")
+    .toUpperCase()
+    .replace("-", "");
+
+  let algorithm = "SHA-1";
+
+  if (algorithmRaw === "SHA256") {
+    algorithm = "SHA-256";
+  } else if (algorithmRaw === "SHA512") {
+    algorithm = "SHA-512";
   }
 
   return {
     secret: secret.replace(/\s+/g, "").toUpperCase(),
     issuer,
     label,
-    algorithm: (url.searchParams.get("algorithm") || "SHA1").toUpperCase(),
     digits: Number(url.searchParams.get("digits") || 6),
-    period: Number(url.searchParams.get("period") || 30)
+    period: Number(url.searchParams.get("period") || 30),
+    algorithm
   };
 }
 
-function base32ToBytes(base32) {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-  const cleaned = base32.replace(/=+$/, "").toUpperCase();
+function base32ToBytes(secret) {
+  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+  const cleaned = secret
+    .replace(/\s+/g, "")
+    .replace(/=+$/g, "")
+    .toUpperCase();
+
+  if (!cleaned.length) {
+    throw new Error("Secret key is empty.");
+  }
 
   let bits = "";
 
-  for (const c of cleaned) {
-    const val = chars.indexOf(c);
-    if (val === -1) throw new Error("Invalid Base32 secret.");
-    bits += val.toString(2).padStart(5, "0");
+  for (const char of cleaned) {
+    const value = alphabet.indexOf(char);
+
+    if (value === -1) {
+      throw new Error(`Invalid character in secret: ${char}`);
+    }
+
+    bits += value.toString(2).padStart(5, "0");
   }
 
   const bytes = [];
@@ -132,8 +161,8 @@ function base32ToBytes(base32) {
   return new Uint8Array(bytes);
 }
 
-async function generateCode(entry) {
-  const secretBytes = base32ToBytes(entry.secret);
+async function generateOTP(entry) {
+  const keyBytes = base32ToBytes(entry.secret);
 
   const epoch = Math.floor(Date.now() / 1000);
   const counter = Math.floor(epoch / entry.period);
@@ -141,12 +170,12 @@ async function generateCode(entry) {
   const buffer = new ArrayBuffer(8);
   const view = new DataView(buffer);
 
-  view.setUint32(0, Math.floor(counter / 4294967296));
-  view.setUint32(4, counter);
+  view.setUint32(0, Math.floor(counter / 4294967296), false);
+  view.setUint32(4, counter >>> 0, false);
 
-  const key = await crypto.subtle.importKey(
+  const cryptoKey = await crypto.subtle.importKey(
     "raw",
-    secretBytes,
+    keyBytes,
     {
       name: "HMAC",
       hash: { name: entry.algorithm }
@@ -156,7 +185,7 @@ async function generateCode(entry) {
   );
 
   const signature = new Uint8Array(
-    await crypto.subtle.sign("HMAC", key, buffer)
+    await crypto.subtle.sign("HMAC", cryptoKey, buffer)
   );
 
   const offset = signature[signature.length - 1] & 0x0f;
@@ -167,9 +196,9 @@ async function generateCode(entry) {
     ((signature[offset + 2] & 0xff) << 8) |
     (signature[offset + 3] & 0xff);
 
-  return (binary % (10 ** entry.digits))
-    .toString()
-    .padStart(entry.digits, "0");
+  const otp = binary % (10 ** entry.digits);
+
+  return otp.toString().padStart(entry.digits, "0");
 }
 
 function secondsRemaining(period) {
@@ -178,8 +207,8 @@ function secondsRemaining(period) {
 
 async function render() {
   const allEntries = [
-    ...savedEntries.map(x => ({ ...x, saved: true })),
-    ...temporaryEntries.map(x => ({ ...x, saved: false }))
+    ...savedEntries.map(item => ({ ...item, saved: true })),
+    ...tempEntries.map(item => ({ ...item, saved: false }))
   ];
 
   if (!allEntries.length) {
@@ -190,27 +219,30 @@ async function render() {
 
   emptyState.style.display = "none";
 
-  const cards = await Promise.all(
+  const html = await Promise.all(
     allEntries.map(async entry => {
-      let code = "------";
+      let code = "INVALID";
 
       try {
-        code = await generateCode(entry);
-      } catch {
-        code = "ERROR";
+        code = await generateOTP(entry);
+      } catch (err) {
+        console.error("OTP error:", err, entry);
       }
 
       const remaining = secondsRemaining(entry.period);
       const progress = (remaining / entry.period) * 100;
 
       return `
-        <div class="col-md-6">
+        <div class="col-12 col-md-6">
           <div class="otp-card">
             <div class="otp-card-inner">
+
               <div class="d-flex justify-content-between gap-3">
                 <div>
-                  <div class="otp-title">${entry.label}</div>
-                  <div class="otp-subtitle">${entry.issuer || "No issuer"}</div>
+                  <div class="otp-title">${escapeHtml(entry.label)}</div>
+                  <div class="otp-subtitle">
+                    ${escapeHtml(entry.issuer || "No issuer")}
+                  </div>
                 </div>
 
                 <div class="status-pill ${entry.saved ? "status-saved" : "status-temp"}">
@@ -225,7 +257,9 @@ async function render() {
               </div>
 
               <div class="otp-code-wrap">
-                <div class="otp-code">${code}</div>
+                <div class="otp-code ${code === "INVALID" ? "text-danger" : ""}">
+                  ${code}
+                </div>
 
                 <div class="progress-bar-wrap">
                   <div class="progress-bar-inner" style="width:${progress}%"></div>
@@ -237,16 +271,24 @@ async function render() {
               </div>
 
               <div class="otp-actions">
-                <button class="btn btn-primary btn-sm" onclick="copyCode('${code}')">
+                <button
+                  class="btn btn-primary btn-sm"
+                  onclick="copyCode('${code}')"
+                  ${code === "INVALID" ? "disabled" : ""}
+                >
                   <i class="fa-solid fa-copy me-1"></i>
                   Copy
                 </button>
 
-                <button class="btn btn-outline-danger btn-sm" onclick="removeEntry('${entry.id}', ${entry.saved})">
+                <button
+                  class="btn btn-outline-danger btn-sm"
+                  onclick="deleteEntry('${entry.id}', ${entry.saved})"
+                >
                   <i class="fa-solid fa-trash me-1"></i>
                   Delete
                 </button>
               </div>
+
             </div>
           </div>
         </div>
@@ -254,65 +296,75 @@ async function render() {
     })
   );
 
-  otpList.innerHTML = cards.join("");
+  otpList.innerHTML = html.join("");
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 window.copyCode = async function(code) {
   try {
     await navigator.clipboard.writeText(code);
-    showMessage(`Copied OTP code: <strong>${code}</strong>`);
+    showMessage(`Copied: <strong>${code}</strong>`);
   } catch {
     showMessage("Could not copy the OTP code.", "error");
   }
 };
 
-window.removeEntry = function(id, saved) {
+window.deleteEntry = function(id, saved) {
   if (saved) {
-    savedEntries = savedEntries.filter(x => x.id !== id);
+    savedEntries = savedEntries.filter(item => item.id !== id);
     saveEntries();
   } else {
-    temporaryEntries = temporaryEntries.filter(x => x.id !== id);
+    tempEntries = tempEntries.filter(item => item.id !== id);
   }
 
   render();
 };
 
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async e => {
   e.preventDefault();
   clearMessage();
 
   try {
     const parsed = parseInput(input.value);
 
-    const finalLabel =
-      labelInput.value.trim() ||
-      parsed.label ||
-      nextLabel();
-
     const entry = {
       id: crypto.randomUUID(),
-      label: finalLabel,
+      label:
+        labelInput.value.trim() ||
+        parsed.label ||
+        getNextLabel(),
       issuer: parsed.issuer,
       secret: parsed.secret,
-      algorithm: parsed.algorithm,
-      digits: parsed.digits,
-      period: parsed.period
+      digits: parsed.digits || 6,
+      period: parsed.period || 30,
+      algorithm: parsed.algorithm || "SHA-1"
     };
+
+    // Test immediately before saving
+    await generateOTP(entry);
 
     if (saveCheckbox.checked) {
       savedEntries.push(entry);
       saveEntries();
     } else {
-      temporaryEntries.push(entry);
+      tempEntries.push(entry);
     }
 
     form.reset();
     saveCheckbox.checked = true;
 
-    showMessage(`Added <strong>${finalLabel}</strong>.`);
+    showMessage(`Added <strong>${escapeHtml(entry.label)}</strong>.`);
     render();
   } catch (err) {
-    showMessage(err.message, "error");
+    console.error(err);
+    showMessage(err.message || "Could not add this TOTP.", "error");
   }
 });
 
@@ -325,7 +377,9 @@ document.getElementById("clearFormBtn").addEventListener("click", () => {
 document.getElementById("refreshBtn").addEventListener("click", render);
 
 document.getElementById("clearSavedBtn").addEventListener("click", () => {
-  if (!confirm("Delete all saved OTP entries from browser storage?")) return;
+  if (!confirm("Delete all saved entries from browser storage?")) {
+    return;
+  }
 
   savedEntries = [];
   saveEntries();
@@ -334,4 +388,5 @@ document.getElementById("clearSavedBtn").addEventListener("click", () => {
 });
 
 setInterval(render, 1000);
+
 render();
