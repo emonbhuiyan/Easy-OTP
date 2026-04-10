@@ -1,149 +1,254 @@
-/* style.css */
-:root {
-  --bg: #0f172a;
-  --bg2: #111827;
-  --card: rgba(255,255,255,0.96);
-  --primary: #2563eb;
-  --primary-soft: rgba(37,99,235,0.12);
-  --border: rgba(15,23,42,0.08);
-  --shadow: 0 18px 45px rgba(2,6,23,0.18);
-  --radius: 22px;
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(37,99,235,0.20), transparent 30%),
-    radial-gradient(circle at top right, rgba(14,165,233,0.18), transparent 25%),
-    linear-gradient(140deg, var(--bg), var(--bg2));
-  font-family: Inter, system-ui, sans-serif;
+  background: #f5f7fb;
+  color: #202124;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-.hero-card,
-.main-card {
-  background: var(--card);
-  border: none;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
+.container {
+  max-width: 1120px;
 }
 
-.hero-card {
-  padding: 2rem;
+/* Hero */
+
+.hero-section {
+  position: relative;
+  background: #ffffff;
+  border: 1px solid #e8eaed;
+  border-radius: 32px;
+  padding: 3rem 2rem;
+  box-shadow: 0 2px 10px rgba(60, 64, 67, 0.08);
 }
 
-.brand-pill {
+.hero-content {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.hero-logo {
+  width: 82px;
+  height: 82px;
+  margin: 0 auto;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #4285f4, #34a853);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 2rem;
+  box-shadow: 0 12px 28px rgba(66, 133, 244, 0.22);
+}
+
+.hero-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.7rem;
-  background: var(--primary-soft);
-  color: var(--primary);
-  padding: 0.6rem 1rem;
+  padding: 0.5rem 1rem;
   border-radius: 999px;
+  background: #e8f0fe;
+  color: #1967d2;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.hero-title {
+  font-size: clamp(2.6rem, 5vw, 4.2rem);
   font-weight: 700;
+  letter-spacing: -0.04em;
+  color: #202124;
 }
 
-.hero-side-card {
-  background: linear-gradient(135deg, rgba(37,99,235,0.10), rgba(14,165,233,0.10));
-  border-radius: 18px;
-  padding: 1.2rem;
+.hero-subtitle {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #3c4043;
 }
 
-.disclaimer-card {
-  border: none;
-  border-radius: 18px;
-  box-shadow: var(--shadow);
+.hero-description {
+  max-width: 650px;
+  margin: 0 auto;
+  color: #5f6368;
+  font-size: 1rem;
+  line-height: 1.7;
 }
+
+.notice-float {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+}
+
+.notice-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  background: #fff4d6;
+  border: 1px solid #f7d26a;
+  color: #9b6200;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.notice-link:hover {
+  background: #ffe7a8;
+  color: #7a4e00;
+  transform: translateY(-1px);
+}
+
+/* Cards */
+
+.main-card {
+  background: #fff;
+  border: 1px solid #e8eaed;
+  border-radius: 28px;
+  box-shadow: 0 1px 6px rgba(60, 64, 67, 0.08);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #202124;
+}
+
+.section-title i {
+  color: #1a73e8;
+}
+
+.otp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Form */
 
 .form-control {
-  border-radius: 14px;
-  padding: 0.85rem 1rem;
-  border: 1px solid rgba(148,163,184,0.35);
+  border-radius: 16px;
+  border: 1px solid #dadce0;
+  padding: 0.95rem 1rem;
+  box-shadow: none;
 }
 
 .form-control:focus {
-  border-color: rgba(37,99,235,0.45);
-  box-shadow: 0 0 0 0.2rem rgba(37,99,235,0.12);
+  border-color: #4285f4;
+  box-shadow: 0 0 0 4px rgba(66, 133, 244, 0.12);
 }
 
 .save-box {
-  background: #f8fafc;
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 0.9rem 1rem;
+  background: #f8f9fa;
+  border: 1px solid #e8eaed;
+  border-radius: 16px;
+  padding: 1rem;
+  min-height: 58px;
+  display: flex;
+  align-items: center;
 }
 
 .btn {
   border-radius: 14px;
+  font-weight: 500;
 }
 
+.btn-primary {
+  background: #1a73e8;
+  border-color: #1a73e8;
+}
+
+.btn-primary:hover {
+  background: #1765cc;
+  border-color: #1765cc;
+}
+
+/* Messages */
+
+.message {
+  border-radius: 14px;
+  padding: 0.95rem 1rem;
+}
+
+.message-success {
+  background: #e6f4ea;
+  color: #137333;
+}
+
+.message-error {
+  background: #fce8e6;
+  color: #c5221f;
+}
+
+/* Empty */
+
 .empty-state {
-  border: 2px dashed rgba(148,163,184,0.35);
-  border-radius: 18px;
-  padding: 2rem;
   text-align: center;
-  color: #64748b;
+  border: 1px dashed #d2d5da;
+  border-radius: 24px;
+  padding: 2.5rem 1rem;
+  color: #5f6368;
 }
 
 .empty-state i {
-  display: block;
   font-size: 2rem;
   margin-bottom: 0.8rem;
+  color: #9aa0a6;
 }
 
+/* OTP Card */
+
 .otp-card {
-  background: linear-gradient(180deg, #fff, #f8fbff);
-  border: 1px solid var(--border);
-  border-radius: 20px;
+  background: #fff;
+  border: 1px solid #e8eaed;
+  border-radius: 24px;
   height: 100%;
+  transition: all 0.2s ease;
+}
+
+.otp-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(60, 64, 67, 0.12);
 }
 
 .otp-card-inner {
-  padding: 1.2rem;
+  padding: 1.25rem;
 }
 
 .otp-title {
-  font-size: 1.1rem;
-  font-weight: 800;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #202124;
 }
 
 .otp-subtitle {
-  color: #64748b;
+  color: #5f6368;
   font-size: 0.9rem;
 }
 
-.otp-code-wrap {
-  margin-top: 1rem;
-  background: #0f172a;
-  color: white;
-  border-radius: 18px;
-  padding: 1rem;
-}
-
-.otp-code {
-  font-size: 2.2rem;
-  font-weight: 900;
-  letter-spacing: 0.22em;
-  margin-bottom: 0.75rem;
-}
-
-.progress-bar-wrap {
-  background: rgba(255,255,255,0.12);
-  height: 10px;
+.status-pill {
+  padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  overflow: hidden;
+  font-size: 0.8rem;
+  font-weight: 700;
 }
 
-.progress-bar-inner {
-  background: linear-gradient(90deg, #60a5fa, #22c55e);
-  height: 100%;
-  transition: width 0.4s linear;
+.status-saved {
+  background: #e6f4ea;
+  color: #137333;
 }
 
-.otp-timer {
-  margin-top: 0.7rem;
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.85);
+.status-temp {
+  background: #fce8e6;
+  color: #c5221f;
 }
 
 .otp-meta {
@@ -154,60 +259,96 @@ body {
 }
 
 .meta-pill {
-  background: #eef2ff;
-  color: #3730a3;
+  background: #f1f3f4;
+  border: 1px solid #e8eaed;
+  color: #3c4043;
   border-radius: 999px;
   padding: 0.35rem 0.7rem;
   font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.otp-code-wrap {
+  margin-top: 1rem;
+  background: #f8f9fa;
+  border: 1px solid #e8eaed;
+  border-radius: 18px;
+  padding: 1rem;
+}
+
+.otp-code {
+  font-size: 2.2rem;
   font-weight: 700;
+  color: #1967d2;
+  letter-spacing: 0.18em;
+  margin-bottom: 0.8rem;
+}
+
+.progress-bar-wrap {
+  height: 10px;
+  background: #dadce0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-inner {
+  height: 100%;
+  background: linear-gradient(90deg, #4285f4, #34a853);
+}
+
+.otp-timer {
+  margin-top: 0.7rem;
+  color: #5f6368;
+  font-size: 0.9rem;
 }
 
 .otp-actions {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.6rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
-.status-pill {
-  border-radius: 999px;
-  padding: 0.3rem 0.7rem;
-  font-size: 0.8rem;
-  font-weight: 700;
+/* Disclaimer */
+
+.disclaimer-card {
+  background: #fff8e7;
+  border: 1px solid #f6d47a;
+  border-radius: 28px;
+  padding: 2rem;
+  color: #5f370e;
 }
 
-.status-saved {
-  background: rgba(16,185,129,0.12);
-  color: #047857;
+.disclaimer-icon {
+  color: #d68000;
+  font-size: 1.5rem;
+  margin-top: 0.2rem;
 }
 
-.status-temp {
-  background: rgba(239,68,68,0.12);
-  color: #b91c1c;
-}
-
-.message {
-  padding: 0.9rem 1rem;
-  border-radius: 14px;
-}
-
-.message-success {
-  background: rgba(16,185,129,0.12);
-  color: #047857;
-}
-
-.message-error {
-  background: rgba(239,68,68,0.12);
-  color: #b91c1c;
-}
+/* Mobile */
 
 @media (max-width: 768px) {
-  .hero-card {
-    padding: 1.4rem;
+  .hero-section {
+    padding: 2rem 1.25rem;
+  }
+
+  .notice-float {
+    position: static;
+    margin-bottom: 1rem;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 2.4rem;
   }
 
   .otp-code {
-    font-size: 1.9rem;
-    letter-spacing: 0.14em;
+    font-size: 1.8rem;
+    letter-spacing: 0.12em;
+  }
+
+  .otp-header {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

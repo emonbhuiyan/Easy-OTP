@@ -5,201 +5,196 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>Easy OTP</title>
-  <meta name="description" content="Easy OTP generates TOTP codes directly in your browser for quick use. Nothing is uploaded or synced.">
-  <meta name="theme-color" content="#0f172a">
+  <meta name="description" content="Easy OTP generates TOTP codes directly in your browser for quick temporary use.">
+  <meta name="theme-color" content="#ffffff">
 
-  <!-- Favicon -->
-  <link
-    rel="icon"
-    type="image/svg+xml"
-    href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/svgs/solid/shield-halved.svg"
-  >
+  <link rel="icon" type="image/svg+xml" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/svgs/solid/shield-halved.svg">
 
-  <!-- Bootstrap -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-  >
-
-  <!-- Font Awesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css"
-  >
-
-  <!-- Your CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <div class="container py-4 py-lg-5">
-    <div class="mx-auto" style="max-width: 1100px;">
 
-      <!-- Hero -->
-      <div class="hero-card mb-4">
-        <div class="brand-pill mb-3">
+    <!-- Hero -->
+    <section class="hero-section mb-4">
+
+      <div class="notice-float">
+        <a href="#important-notes" class="notice-link">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Important Notes
+        </a>
+      </div>
+
+      <div class="hero-content text-center">
+        <div class="hero-logo mb-4">
           <i class="fa-solid fa-shield-halved"></i>
-          <span>Easy OTP</span>
         </div>
 
-        <h1 class="display-5 fw-bold mb-3">Easy OTP</h1>
-
-        <p class="lead mb-2">
-          Quick TOTP codes directly in your browser.
-        </p>
-
-        <p class="text-secondary mb-0">
-          Easy OTP is only for quick browser use. Nothing is uploaded, synced, or sent anywhere.
-        </p>
-      </div>
-
-      <!-- Disclaimer -->
-      <div class="alert alert-warning disclaimer-card mb-4">
-        <div class="d-flex align-items-start gap-3">
-          <i class="fa-solid fa-triangle-exclamation fs-4 mt-1"></i>
-
-          <div>
-            <strong>Important:</strong>
-            Easy OTP is only meant for quick browser use and temporary access to TOTP codes.
-
-            <div class="mt-2">
-              Saved keys stay only in your browser using local storage and may disappear if you clear cache, cookies, browser data, or use a cleaner tool.
-            </div>
-
-            <div class="mt-2">
-              For important accounts, it is safer to use dedicated apps such as Google Authenticator, Microsoft Authenticator, Authy, or similar authenticator apps.
-            </div>
-          </div>
+        <div class="hero-badge mb-3">
+          Browser-only TOTP Generator
         </div>
-      </div>
 
-      <!-- Add Form -->
-      <div class="card main-card mb-4">
-        <div class="card-body p-4">
-          <div class="d-flex align-items-center gap-2 mb-4">
-            <i class="fa-solid fa-plus-circle text-primary fs-4"></i>
-            <h2 class="h4 mb-0">Add TOTP</h2>
+        <h1 class="hero-title mb-3">
+          Easy OTP
+        </h1>
+
+        <p class="hero-subtitle mb-2">
+          Quick TOTP codes directly in your browser
+        </p>
+
+        <p class="hero-description mb-0">
+          Easy OTP is made for quick temporary use. Nothing is uploaded, synced, or sent anywhere.
+          Just paste an otpauth://totp/... link or a Base32 secret and get your code instantly.
+        </p>
+      </div>
+    </section>
+
+    <!-- Add TOTP -->
+    <section class="main-card mb-4">
+      <div class="card-body p-4 p-lg-5">
+
+        <div class="section-title mb-4">
+          <i class="fa-solid fa-plus-circle"></i>
+          <span>Add TOTP</span>
+        </div>
+
+        <form id="totpForm">
+
+          <div class="mb-4">
+            <label for="totpInput" class="form-label fw-semibold">
+              TOTP URI or Secret Key
+            </label>
+
+            <textarea
+              id="totpInput"
+              class="form-control"
+              rows="4"
+              placeholder="Paste otpauth://totp/... or a Base32 secret like JBSWY3DPEHPK3PXP"
+              required
+            ></textarea>
+
+            <div class="form-text mt-2">
+              Supports both:
+              <br>
+              <code>otpauth://totp/GitHub:user@email.com?secret=JBSWY3DPEHPK3PXP&amp;issuer=GitHub</code>
+              <br>
+              <code>JBSWY3DPEHPK3PXP</code>
+            </div>
           </div>
 
-          <form id="totpForm">
-            <div class="mb-3">
-              <label for="totpInput" class="form-label fw-semibold">
-                TOTP URI or Secret Key
+          <div class="row g-3">
+            <div class="col-md-7">
+              <label for="labelInput" class="form-label fw-semibold">
+                Label
               </label>
 
-              <textarea
-                id="totpInput"
+              <input
+                type="text"
+                id="labelInput"
                 class="form-control"
-                rows="4"
-                placeholder="Paste an otpauth://totp/... URI or a Base32 secret like JBSWY3DPEHPK3PXP"
-                required
-              ></textarea>
-
-              <div class="form-text">
-                Supported examples:
-                <br>
-                <code>otpauth://totp/GitHub:user@email.com?secret=JBSWY3DPEHPK3PXP&amp;issuer=GitHub</code>
-                <br>
-                <code>JBSWY3DPEHPK3PXP</code>
-              </div>
+                placeholder="Optional. If empty it will use totp1, totp2..."
+              >
             </div>
 
-            <div class="row g-3">
-              <div class="col-md-7">
-                <label for="labelInput" class="form-label fw-semibold">
-                  Label
-                </label>
+            <div class="col-md-5">
+              <label class="form-label fw-semibold d-block">
+                Save Option
+              </label>
 
-                <input
-                  type="text"
-                  id="labelInput"
-                  class="form-control"
-                  placeholder="Optional. If empty it will use the TOTP name or totp1, totp2..."
-                >
-              </div>
-
-              <div class="col-md-5">
-                <label class="form-label fw-semibold d-block">
-                  Save Option
-                </label>
-
-                <div class="save-box">
-                  <div class="form-check m-0">
-                    <input
-                      class="form-check-input"
-                      type="checkbox"
-                      id="saveCheckbox"
-                      checked
-                    >
-
-                    <label class="form-check-label" for="saveCheckbox">
-                      Save in browser local storage
-                    </label>
-                  </div>
+              <div class="save-box">
+                <div class="form-check m-0">
+                  <input
+                    class="form-check-input"
+                    type="checkbox"
+                    id="saveCheckbox"
+                    checked
+                  >
+                  <label class="form-check-label" for="saveCheckbox">
+                    Save in browser local storage
+                  </label>
                 </div>
               </div>
             </div>
-
-            <div class="d-flex flex-wrap gap-2 mt-4">
-              <button type="submit" class="btn btn-primary px-4">
-                <i class="fa-solid fa-key me-2"></i>
-                Add TOTP
-              </button>
-
-              <button type="button" id="clearFormBtn" class="btn btn-outline-secondary px-4">
-                <i class="fa-solid fa-eraser me-2"></i>
-                Clear
-              </button>
-            </div>
-
-            <div id="messageBox" class="mt-3"></div>
-          </form>
-        </div>
-      </div>
-
-      <!-- OTP List -->
-      <div class="card main-card">
-        <div class="card-body p-4">
-
-          <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-            <div class="d-flex align-items-center gap-2">
-              <i class="fa-solid fa-list-check text-primary fs-4"></i>
-              <h2 class="h4 mb-0">Your OTPs</h2>
-            </div>
-
-            <div class="d-flex flex-wrap gap-2">
-              <button
-                type="button"
-                class="btn btn-outline-primary btn-sm"
-                id="refreshBtn"
-              >
-                <i class="fa-solid fa-rotate me-1"></i>
-                Refresh
-              </button>
-
-              <button
-                type="button"
-                class="btn btn-outline-danger btn-sm"
-                id="clearSavedBtn"
-              >
-                <i class="fa-solid fa-trash me-1"></i>
-                Clear Saved
-              </button>
-            </div>
           </div>
 
-          <div id="emptyState" class="empty-state">
-            <i class="fa-solid fa-lock-open"></i>
-            <div class="fw-semibold mb-1">No OTP added yet</div>
-            <div class="text-secondary">
-              Add a TOTP above to generate live OTP codes.
-            </div>
+          <div class="d-flex flex-wrap gap-2 mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="fa-solid fa-key me-2"></i>
+              Add TOTP
+            </button>
+
+            <button type="button" class="btn btn-outline-secondary px-4" id="clearFormBtn">
+              <i class="fa-solid fa-eraser me-2"></i>
+              Clear
+            </button>
           </div>
 
-          <div id="otpList" class="row g-3"></div>
+          <div id="messageBox" class="mt-3"></div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- OTP List -->
+    <section class="main-card mb-4">
+      <div class="card-body p-4 p-lg-5">
+
+        <div class="otp-header mb-4">
+          <div class="section-title">
+            <i class="fa-solid fa-list-check"></i>
+            <span>Your OTPs</span>
+          </div>
+
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-outline-primary btn-sm" id="refreshBtn" type="button">
+              <i class="fa-solid fa-rotate"></i>
+              Refresh
+            </button>
+
+            <button class="btn btn-outline-danger btn-sm" id="clearSavedBtn" type="button">
+              <i class="fa-solid fa-trash"></i>
+              Clear Saved
+            </button>
+          </div>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+          <i class="fa-solid fa-lock-open"></i>
+          <div class="fw-semibold mb-1">No OTP added yet</div>
+          <div>Add your first TOTP above to start generating codes.</div>
+        </div>
+
+        <div id="otpList" class="row g-3"></div>
+
+      </div>
+    </section>
+
+    <!-- Important Notes -->
+    <section id="important-notes" class="disclaimer-card">
+      <div class="d-flex align-items-start gap-3">
+        <i class="fa-solid fa-triangle-exclamation disclaimer-icon"></i>
+
+        <div>
+          <h2 class="h5 fw-bold mb-3">Important Notes</h2>
+
+          <p class="mb-2">
+            Easy OTP is only for quick browser use and temporary TOTP access.
+          </p>
+
+          <p class="mb-2">
+            Saved keys stay only in your browser using local storage. They may disappear if you clear browser cache, cookies, local storage, browser data, or use a cleaner tool.
+          </p>
+
+          <p class="mb-0">
+            For important accounts, it is safer to use dedicated authenticator apps such as Google Authenticator, Microsoft Authenticator, Authy, or similar apps.
+          </p>
         </div>
       </div>
+    </section>
 
-    </div>
   </div>
 
   <script src="script.js"></script>
